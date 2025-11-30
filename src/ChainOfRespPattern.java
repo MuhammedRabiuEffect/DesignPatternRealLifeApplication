@@ -7,6 +7,7 @@ interface iLetter
     int getPriority();
     void sendResponse(String response);
     void changeDestination(String newDestination);
+    String getDestination();
 
 }
 class Letter implements iLetter
@@ -28,10 +29,10 @@ class Letter implements iLetter
         this.sender = sender;
         this.destination = destination;
     }
+
     @Override
     public void sendFeedback(String feedback) {
         this.feedback = feedback;
-
 
         System.out.println(" ");
         System.out.println("............................");
@@ -76,6 +77,11 @@ class Letter implements iLetter
         System.out.println(" ");
         System.out.println("............................");
     }
+
+    @Override
+    public String getDestination() {
+        return this.destination;
+    }
 }
 
 interface iHandler
@@ -84,6 +90,59 @@ interface iHandler
     void pass(iLetter letter);
 }
 
+class IT implements iHandler
+{
+
+    @Override
+    public void process(iLetter letter) {
+
+    }
+
+    @Override
+    public void pass(iLetter letter) {
+
+    }
+}
+class HR implements iHandler
+{
+    LetterLinkedList letterBox;
+    Getters getters;
+    HR()
+    {
+        this.letterBox = new LetterLinkedList();
+    }
+    @Override
+    public void process(iLetter letter)
+    {
+        if(letter.getDestination().equalsIgnoreCase("hr"))
+        {
+            switch(letter.getPriority())
+            {
+                case 1:
+                    this.getters = new Getters();
+                    String response = this.getters.getString("Enter Response Message: ");
+                    letter.sendResponse(response);
+                    letter.sendFeedback("responded");
+                    this.getters = null;
+                    this.letterBox.addLetter(letter);
+                    break;
+
+
+
+            }
+            return;
+        }
+        this.pass(letter);
+    }
+
+    iHandler nextHandler;
+    @Override
+    public void pass(iLetter letter)
+    {
+        this.nextHandler = new IT();
+        this.nextHandler.process(letter);
+    }
+}
 public class ChainOfRespPattern {
     /*
 

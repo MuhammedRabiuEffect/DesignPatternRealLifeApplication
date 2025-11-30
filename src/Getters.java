@@ -3,10 +3,10 @@ import java.util.Scanner;
 public class Getters {
 
     private Scanner getScanner;
-    public String getString()
+    public String getString(String prompt)
     {
         getScanner = new Scanner(System.in);
-        System.out.println("[+] Enter Message: ");
-        return getScanner.next();
+        System.out.println(prompt);
+        return getScanner.nextLine();
     }
 }
