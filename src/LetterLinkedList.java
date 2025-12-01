@@ -1,3 +1,4 @@
+
 class NodeLetter
 {
     NodeLetter(iLetter letter)
@@ -15,6 +16,7 @@ interface iLetterLinkedList
     void removeLetter(int letterId);
     void addLetter(iLetter newLetter);
 }
+
 public class LetterLinkedList implements iLetterLinkedList{
 
     NodeLetter headNodeLetter;
