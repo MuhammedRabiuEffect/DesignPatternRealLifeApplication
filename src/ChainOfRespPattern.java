@@ -1,7 +1,7 @@
 
 interface iLetter
 {
-    void sendFeedback(String feedback);
+    void sendFeedback(LetterStage feedback);
     String getSender();
     int getId();
     int getPriority();
@@ -9,8 +9,19 @@ interface iLetter
     void changeDestination(String newDestination);
     String getDestination();
     void changePriority(int newPriority);
+    void cancelLetter();
 
 }
+enum LetterStage
+{
+    // (received, pending, processed, respond: letter)
+    received,
+    pending,
+    processed,
+    responded
+
+}
+
 class Letter implements iLetter
 {
     public
@@ -21,7 +32,7 @@ class Letter implements iLetter
     private
             int letterPriority;
             int letterId;
-            String feedback;
+            LetterStage feedback;
             String response;
 
     Letter(String content, String sender, String destination)
@@ -32,7 +43,7 @@ class Letter implements iLetter
     }
 
     @Override
-    public void sendFeedback(String feedback) {
+    public void sendFeedback(LetterStage feedback) {
         this.feedback = feedback;
 
         System.out.println(" ");
@@ -87,6 +98,11 @@ class Letter implements iLetter
     public void changePriority(int newPriority) {
         this.letterPriority = newPriority;
     }
+
+    @Override
+    public void cancelLetter() {
+        
+    }
 }
 
 interface iHandler
@@ -111,13 +127,13 @@ class IT implements iHandler
         {
             if(letter.getPriority() < 3)
             {
-                letter.sendFeedback("Processed");
+                letter.sendFeedback(LetterStage.processed);
                 this.letterBox.addLetter(letter);
 
                 return;
             }else
             {
-                letter.sendFeedback("Received");
+                letter.sendFeedback(LetterStage.received);
                 this.letterBox.addLetter(letter);
 
                 return;
@@ -152,7 +168,7 @@ class Finance implements iHandler
     public void process(iLetter letter) {
         if(letter.getPriority()  < 2 || letter.getId() < 4)
         {
-            letter.sendFeedback("pending");
+            letter.sendFeedback(LetterStage.pending);
             this.letterBox.addLetter(letter);
             return;
         }else
@@ -196,8 +212,8 @@ class Production implements iHandler
         {
             this.getters = new Getters();
             String response = this.getters.getString("Enter Production Response");
-            letter.sendFeedback(response);
-            letter.sendFeedback("Responded");
+            letter.sendResponse(response);
+            letter.sendFeedback(LetterStage.responded);
 
             this.getters = null;
             return;
@@ -234,7 +250,7 @@ class Marketing implements iHandler
             this.getters = new Getters();
             String response = this.getters.getString("Enter Marketing Response");
             letter.sendResponse(response);
-            letter.sendFeedback("Responded");
+            letter.sendFeedback(LetterStage.responded);
 
             this.letterBox.addLetter(letter);
 
@@ -276,7 +292,7 @@ class HR implements iHandler
                     this.getters = new Getters();
                     String response = this.getters.getString("Enter Response Message: ");
                     letter.sendResponse(response);
-                    letter.sendFeedback("responded");
+                    letter.sendFeedback(LetterStage.responded);
                     this.getters = null;
                     this.letterBox.addLetter(letter);
                     break;
@@ -286,11 +302,11 @@ class HR implements iHandler
                     this.process(letter);
                     break;
                 case 3:
-                    letter.sendFeedback("Pending");
+                    letter.sendFeedback(LetterStage.pending);
                     this.letterBox.addLetter(letter);
                     break;
                 default:
-                    letter.sendFeedback("Received");
+                    letter.sendFeedback(LetterStage.received);
                     this.letterBox.addLetter(letter);
                     break;
             }
@@ -339,6 +355,8 @@ public class ChainOfRespPattern {
         2. destination
         3. content
         4. feedback (received, pending, processed, respond: letter)
+            where a feedback is a letter stage
+            the stage could be received, pending, processed, responded
 
       * the Handler decides to handle the letter or pass to the next handler depending on the destination of the letter
       * where destination could be finance, HR, Marketing, I.T, and Production
